@@ -6,13 +6,13 @@ Dictionary generator for Kindle
 ## dictd
 
 ```
-yaourt -S dictd dict-freedict-fra-en
+yaourt -S dictd [dict-freedict-fra-en]
 ```
 
 ## aspell
 
 ```
-pacman -S aspell aspell-fr
+pacman -S aspell [aspell-fr]
 ```
 
 ## python
@@ -23,7 +23,7 @@ pacman -S python virtualenv
 
 ## kindlegen
 
-Download from Kindle web page and put in the path.
+Download from Kindle web page and put it in the path.
 
 ## virtualenv
 
@@ -51,7 +51,9 @@ You have an example file at config/example.json
 
 # Run
 
+```
 python mobidick.py --settings fr_en.json
+```
 
 # Test
 
@@ -73,4 +75,6 @@ Add test words with some of their inflections to your dictionary file:
 
 Run the tests:
 
+```
 python test_mobidick.py --settings config/fr_en.json
+```
