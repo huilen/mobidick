@@ -1,0 +1,11 @@
+{
+    "language": "fr",
+    "output": "dictionary.mobi",
+    "language_from": "fr-fr",
+    "language_to": "en-us",
+    "test_words": { 
+	"aimer": ["aime", "aimerais"],
+	"trancher": ["tranchait", "trancherait"],
+	"porter": ["portèrent", "porterait"]
+    }
+}

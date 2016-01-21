@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>{{title or default_text}}</title>
+  </head>
+  <body>
+    <h1>{{h1 or default_text}}</h1>
+    <mbp:pagebreak />
+    <a name="toc"></a>
+    <h1>Table of Contents</h1>
+    <p><a href="#words">Words</a></p>
+    <mbp:pagebreak />
+    <a name="words"></a>
+    {% for entry in entries %}
+      <idx:entry>
+        <idx:orth><b>{{entry['word']}}</b>
+	  <idx:infl inflgrp="noun">
+	  {% for inflection in entry['inflections'] %}
+	    <idx:iform value="{{inflection}}"></idx:iform>
+	  {% endfor %}
+	  </idx:infl>
+	</idx:orth>
+	{% for definition in entry['definitions'] %}
+	<ul>
+	  <li>
+	    {{definition}}
+	  </li>
+	</ul>
+	{% endfor %}
+      </idx:entry>
+    {% endfor %}
+  </body>
+</html>
