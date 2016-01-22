@@ -1,11 +1,19 @@
 {
-    "language": "fr",
-    "output": "dictionary.mobi",
+    "title": "French-English Dictionary",
+    "output": "/tmp/dictionary.mobi",
     "language_from": "fr-fr",
     "language_to": "en-us",
+    "dictd_hostname": "localhost",
+    "dictd_port": 2628,
+    "dictd_database": "fra-eng",
+    "snowball_language": "french",
+    "aspell_language": "fr",
     "test_words": { 
 	"aimer": ["aime", "aimerais"],
 	"trancher": ["tranchait", "trancherait"],
 	"porter": ["portèrent", "porterait"]
-    }
+    },
+    "generator_cls": "mobidick.generator.Generator",
+    "kindlegen_path": "<kindlegen_path>/kindlegen",
+    "logging_level": "INFO"
 }

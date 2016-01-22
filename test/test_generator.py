@@ -1,7 +1,10 @@
 import sys
 import logging
 import unittest
-import mobidick
+
+from mobidick.generator import Generator
+
+from mobidick.utils import configuration
 
 from lxml import html
 
@@ -12,11 +15,11 @@ logger = logging.getLogger('mobidick.test')
 class TestMobidick(unittest.TestCase):
 
     def test_words(self):
-        words = self._words()
+        entries = self._entries()
         logger.info("Checking test words")
         for word, inflections in config['test_words'].items():
             logger.info("Checking word '%s'", word)
-            word = [w for w in words.values() if word in w['inflections']][0]
+            word = [w for w in entries.values() if word in w['inflections']][0]
             logger.info("Checking that word exists")
             self.assertTrue(word)
             logger.info("Checking inflections")
@@ -26,8 +29,8 @@ class TestMobidick(unittest.TestCase):
             self.assertTrue(word['definitions'])
 
     def test_template(self):
-        words = self._words()
-        opf_doc, html_doc = mobidick.templates(words, config)
+        entries = self._entries()
+        opf_doc, html_doc = self._templates(entries)
         html_doc = html_doc.replace('idx:entry', 'idxentry')
         html_doc = html_doc.replace('idx:infl', 'idxinfl')
         html_doc = html_doc.replace('idx:iform', 'idxiform')
@@ -47,20 +50,24 @@ class TestMobidick(unittest.TestCase):
             inflection_groups.append(inflections)
         inflection_groups = sorted([sorted(g) for g in inflection_groups])
         expected_groups = sorted([sorted(g['inflections'])
-                                  for g in words.values()])
+                                  for g in entries.values()])
         self.assertEqual(inflection_groups, expected_groups)
 
-    def _words(self):
-        lang = config['language']
-        words = mobidick.words(lang)
-        words = mobidick.stems(words, lang=lang)
-        words = {k: v for k, v in words.items()
+    def _entries(self):
+        generator = Generator(config)
+        entries = generator.words()
+        entries = generator.stems(entries)
+        entries = {k: v for k, v in entries.items()
                  if set(v['inflections']).intersection(config['test_words'])}
-        words = mobidick.definitions(words, lang=lang)
-        return words
+        entries = generator.definitions(entries)
+        return entries
+
+    def _templates(self, entries):
+        generator = Generator(config)
+        return generator.templates(entries)
 
 
 if __name__ == '__main__':
-    config = mobidick.configuration(sys.argv[1:])
+    config = configuration(sys.argv[1:])
     sys.argv = sys.argv[2:]
     unittest.main()
