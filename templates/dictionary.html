@@ -23,9 +23,12 @@
 	  </idx:infl>
 	</idx:orth>
 	{% for definition in entry['definitions'] %}
-	<pre>
-	  {{definition.strip()}}
-	</pre>
+	<p>
+	  <b>{{definition['word']}}</b>
+	  <i>{{definition['phonetic']}}</i>
+	  <i>{{definition['grammar']}}</i>
+	</p>
+	<pre>{{definition['body']}}</pre>
 	<hr />
 	{% endfor %}
       </idx:entry>

@@ -97,14 +97,34 @@ class Generator(object):
         logger.info(message)
         return words
 
+    def format_definition(self, definition):
+        header, body = definition.split('\n', 1)
+        header = re.sub('<[^>]+>', '', header)
+        phonetic = re.search('/.+/', header).group(0)
+        grammar = re.search('&lt;.+&gt;', header).group(0)
+        word = re.search('[^ \n]*', header).group(0)
+        body = body.strip().replace('\n.', '')
+        return {'header': header,
+                'body': body,
+                'phonetic': phonetic,
+                'grammar': grammar,
+                'word': word}
+
     def templates(self, entries):
         logger.info("Compiling dictionary templates")
         env = Environment(loader=FileSystemLoader('templates'))
         template_opf = env.get_template('dictionary.opf')
         template_html = env.get_template('dictionary.html')
         entries = sorted(entries.items(), key=lambda e: e[0])
-        entries = map(lambda e: e[1], entries)
-        entries = filter(lambda e: e['definitions'], entries)
+        entries = [e[1] for e in entries if e[1]['definitions']]
+        for entry in entries:
+            definitions = []
+            for definition in entry['definitions']:
+                try:
+                    definitions.append(self.format_definition(definition))
+                except Exception:
+                    logger.debug("Invalid definition")
+                entry['definitions'] = definitions
         variables = {'entries': entries,
                      'date': datetime.now().strftime('%d/%m/%Y'),
                      'default_text': self.config['title']}
