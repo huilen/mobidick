@@ -1,3 +1,4 @@
+import shutil
 import re
 import os
 import logging
@@ -126,6 +127,7 @@ class Generator(object):
                opf_file.name,
                '-verbose',
                '-o', 'dictionary.mobi']
+        shutil.copyfile('templates/style.css', '/tmp/style.css')
         kindlegen = subprocess.call(cmd)
         os.rename('/tmp/dictionary.mobi', self.config['output'])
         logger.info("Created at {}".format(self.config['output']))
