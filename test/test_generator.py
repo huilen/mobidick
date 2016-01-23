@@ -69,5 +69,6 @@ class TestMobidick(unittest.TestCase):
 
 if __name__ == '__main__':
     config = configuration(sys.argv[1:])
+    logging.basicConfig(level=getattr(logging, config['logging_level']))
     sys.argv = sys.argv[2:]
     unittest.main()

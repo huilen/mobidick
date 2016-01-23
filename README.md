@@ -29,11 +29,8 @@ sudo pacman -S python virtualenv
 
 Download
 [kindlegen](https://www.amazon.com/gp/feature.html?docId=1000765211)
-from Kindle web page and add it to the PATH:
-
-```
-export PATH=$PATH:<kindlegen_path>
-```
+from Kindle web page and configure its path in your configuration file
+(see below):
 
 ### virtualenv ###
 
@@ -51,10 +48,18 @@ Create a configuration file for your dictionary:
 
 ```
 {
-    "language": "fr",
-    "output": "dictionary.mobi",
+    "title": "French-English Dictionary",
+    "output": "/tmp/dictionary.mobi",
     "language_from": "fr-fr",
-    "language_to": "en-us"
+    "language_to": "en-us",
+    "dictd_hostname": "localhost",
+    "dictd_port": 2628,
+    "dictd_database": "fra-eng",
+    "snowball_language": "french",
+    "aspell_language": "fr",
+    "generator_cls": "mobidick.generator.Generator",
+    "kindlegen_path": "<kindlegen_path>/kindlegen",
+    "logging_level": "INFO"
 }
 ```
 
@@ -72,15 +77,13 @@ Add test words with some of their inflections to your dictionary file:
 
 ```
 {
-    "language": "fr",
-    "output": "dictionary.mobi",
-    "language_from": "fr-fr",
-    "language_to": "en-us",
+...
     "test_words": { 
-	      "aimer": ["aime", "aimerais"],
-	      "trancher": ["tranchait", "trancherait"],
-	      "porter": ["portèrent", "porterait"]
+	    "aimer": ["aime", "aimerais"],
+    	"trancher": ["tranchait", "trancherait"],
+	    "porter": ["portèrent", "porterait"]
     }
+...
 }
 ```
 
@@ -107,10 +110,13 @@ You can, for example, override definitions if you want to lookup at
 Wikipedia those words that are not found on dictd. Or you can override
 words if you want to get words from other source than aspell.
 
-You just need to extend Generator as it is shown at mobidick/sample.py
+You just need to extend Generator as it is shown at mobidick/custom.py
 example:
 
 ```
+from mobidick.generator import Generator
+
+
 class SampleGenerator(Generator):
 
     def stems(self, words):
@@ -123,9 +129,21 @@ And configure your class in your configuration file:
 ```
 {
 ...
-    "generator_cls": "sample.SampleGenerator",
+    "generator_cls": "mobidick.custom.SampleGenerator",
 ...
 }
 ```
 
 Then run the generator as always.
+
+## Memoized functions ##
+
+ATENTION: The result of each generation step is memoized. If you
+change anything in your configuration and run the generator again, you
+must delete memoized files before:
+
+```
+rm /tmp/stems.pickle
+rm /tmp/definitions.pickle
+rm /tmp/templates.pickle
+```

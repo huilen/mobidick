@@ -35,17 +35,18 @@ def configuration(argv):
     raise ValueError("Must specify --settings")
 
 
-def print_progress(completed, total):
-    if completed != total:
+def print_progress(completed, total, message=None):
+    if completed != total and completed != 1:
         if completed % 1000 != 0:
             return
     percentage = completed / total * 100
     sys.stdout.write("\r{completed}/{total} ({percentage}%)".format(
         completed=completed, total=total, percentage=int(percentage)))
-    sys.stdout.flush()
+    if message:
+        sys.stdout.write(" " + message)
     if completed == total:
-        sys.stdout.write('\r')
-        sys.stdout.flush()
+        sys.stdout.write("\r")
+    sys.stdout.flush()
 
 
 def load_class(path):

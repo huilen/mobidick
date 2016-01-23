@@ -14,7 +14,7 @@
     <a name="words"></a>
     {% for entry in entries %}
       <idx:entry>
-        <idx:orth><b>{{entry['word']}}</b>
+        <idx:orth><b>{{', '.join(entry['words'])}}</b>
 	  <idx:infl inflgrp="noun">
 	  {% for inflection in entry['inflections'] %}
 	    <idx:iform value="{{inflection}}"></idx:iform>

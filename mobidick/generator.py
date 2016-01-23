@@ -25,7 +25,7 @@ class Generator(object):
 
     def words(self):
         logger.info("Finding words")
-        cmd = 'aspell -l {lang} dump master | aspell -l {lang} expand'
+        cmd = 'aspell -l {lang} dump master'
         aspell = subprocess.Popen(cmd.format(lang=self.config['aspell_language']),
                                   shell=True, stdout=subprocess.PIPE)
         output = aspell.stdout.read().decode()
@@ -40,10 +40,11 @@ class Generator(object):
         stemmer = SnowballStemmer(language)
         logger.info("Finding stems")
         for idx, word in enumerate(words, start=1):
+            message = "{} stems found".format(len(stems))
+            print_progress(idx, len(words), message)
             stem = stemmer.stem(word)
             stems[stem]['inflections'].append(word)
-            print_progress(idx, len(words))
-        logger.info("{} stems found".format(len(stems)))
+        logger.info(message)
         return dict(stems)
 
     @memoized('/tmp/definitions.pickle')
@@ -73,25 +74,28 @@ class Generator(object):
         code, _ = read()  # skip first line.
         assert code == 220
         count = 0
-        for idx, stem in enumerate(words, start=1):
-            for word in words[stem]['inflections']:
+        for idx, stem in enumerate(sorted(words), start=1):
+            message = "{} definitions found".format(count)
+            print_progress(idx, len(words), message)
+            words[stem]['definitions'] = []
+            words[stem]['words'] = []
+            for word in sorted(words[stem]['inflections']):
                 cmd ='d {database} {word}\n'.format(
                     word=word, database=self.config['dictd_database'])
                 sock.send(cmd.encode())
                 code, response = read()
-                words[stem]['definitions'] = []
                 if code == 552:
                     logger.debug("Definition not found %s", word)
                 elif code == 250:
                     count += 1
                     definition = parse_definition(stem, word, response)
                     words[stem]['definitions'].append(definition)
-                    break
+                    words[stem]['words'].append(word)
+                    continue
                 elif code == 550:
                     raise Exception("Invalid dictd database")
-            print_progress(idx, len(words))
         sock.close()
-        logger.info("{} definitions found".format(count))
+        logger.info(message)
         return words
 
     @memoized("/tmp/templates.pickle")
@@ -100,7 +104,10 @@ class Generator(object):
         env = Environment(loader=FileSystemLoader('templates'))
         template_opf = env.get_template('dictionary.opf')
         template_html = env.get_template('dictionary.html')
-        variables = {'entries': [e for e in entries.values() if 'definitions' in e],
+        entries = sorted(entries.items(), key=lambda e: e[0])
+        entries = map(lambda e: e[1], entries)
+        entries = filter(lambda e: e['definitions'], entries)
+        variables = {'entries': entries,
                      'date': datetime.now().strftime('%d/%m/%Y'),
                      'default_text': self.config['title']}
         variables.update(self.config)
@@ -118,8 +125,9 @@ class Generator(object):
                html_file.name,
                opf_file.name,
                '-verbose',
-               '-o', self.config['output']]
+               '-o', 'dictionary.mobi']
         kindlegen = subprocess.call(cmd)
+        os.rename('/tmp/dictionary.mobi', self.config['output'])
         logger.info("Created at {}".format(self.config['output']))
 
     def generate(self):
