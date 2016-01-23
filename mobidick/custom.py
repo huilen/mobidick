@@ -1,6 +1,7 @@
 import logging
 
 from mobidick.generator import Generator
+from mobidick.utils import memoized
 
 
 logger = logging.getLogger(__name__)
@@ -25,3 +26,18 @@ class DictFallbackGenerator(SampleGenerator):
         import pdb; pdb.set_trace()
         words.update(super(DictFallbackGenerator, self).definitions(not_found))
         return words
+
+
+class MemoizedGenerator(Generator):
+
+    @memoized('/tmp/stems.pickle')
+    def stems(self, words):
+        return super(MemoizedGenerator, self).stems(words)
+
+    @memoized('/tmp/definitions.pickle')
+    def definitions(self, words):
+        return super(MemoizedGenerator, self).definitions(words)
+
+    @memoized('/tmp/templates.pickle')
+    def templates(self, entries):
+        return super(MemoizedGenerator, self).templates(entries)

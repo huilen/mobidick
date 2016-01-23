@@ -13,7 +13,7 @@ from collections import defaultdict
 from nltk.stem.snowball import SnowballStemmer
 from jinja2 import Environment, FileSystemLoader
 
-from mobidick.utils import memoized, print_progress, configuration, load_class
+from mobidick.utils import print_progress, configuration, load_class
 
 
 logger = logging.getLogger(__name__)
@@ -34,7 +34,6 @@ class Generator(object):
         logger.info("{} words found".format(len(words)))
         return words
 
-    @memoized('/tmp/stems.pickle')
     def stems(self, words):
         language = self.config['snowball_language']
         stems = defaultdict(lambda: {'inflections': []})
@@ -48,7 +47,6 @@ class Generator(object):
         logger.info(message)
         return dict(stems)
 
-    @memoized('/tmp/definitions.pickle')
     def definitions(self, words):
         logger.info("Finding definitions")
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -99,7 +97,6 @@ class Generator(object):
         logger.info(message)
         return words
 
-    @memoized("/tmp/templates.pickle")
     def templates(self, entries):
         logger.info("Compiling dictionary templates")
         env = Environment(loader=FileSystemLoader('templates'))

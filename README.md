@@ -9,7 +9,7 @@ Dictionary generator for Kindle
 ### dictd ###
 
 ```
-yaourt -S dictd [dict-freedict-fra-en]
+yaourt -S dictd [dict-freedict-fra-eng]
 sudo systemctl start dictd
 ```
 
@@ -136,14 +136,23 @@ And configure your class in your configuration file:
 
 Then run the generator as always.
 
-## Memoized functions ##
+### Custom Generators ###
 
-ATENTION: The result of each generation step is memoized. If you
-change anything in your configuration and run the generator again, you
-must delete memoized files before:
+You can configure any of these generators through your configuration
+file:
 
 ```
-rm /tmp/stems.pickle
-rm /tmp/definitions.pickle
-rm /tmp/templates.pickle
+{
+...
+    "generator_cls": "mobidick.custom.<custom_generator>",
+...
+}
 ```
+
+Of course, you can also extend from these generators as from the
+Generator base class, if you want a more specific behavior.
+
+##### MemoizedGenerator #####
+
+Use this generator if you want to memoize steps. This is specially
+useful for development.
