@@ -1,7 +1,9 @@
+import sys
+import os
 import logging
 
 from mobidick.generator import Generator
-from mobidick.utils import memoized
+from mobidick.utils import memoized, configuration
 
 
 logger = logging.getLogger(__name__)
@@ -30,6 +32,21 @@ class DictFallbackGenerator(SampleGenerator):
 
 class MemoizedGenerator(Generator):
 
+    def __init__(self, config):
+        super(MemoizedGenerator, self).__init__(config)
+        for idx, arg in enumerate(sys.argv):
+            if arg in ['-f', '--forget']:
+                value = None
+                try:
+                    value = sys.argv[idx + 1]
+                except IndexError:
+                    pass
+                values = ['templates', 'definitions', 'stems']
+                if value in values:
+                    values = [value]
+                for value in values:
+                    os.remove('/tmp/{}.pickle'.format(value))
+                
     @memoized('/tmp/stems.pickle')
     def stems(self, words):
         return super(MemoizedGenerator, self).stems(words)

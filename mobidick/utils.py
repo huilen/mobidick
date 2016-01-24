@@ -1,7 +1,6 @@
 import sys
 import json
 import logging
-import getopt
 import pickle
 import importlib
 
@@ -26,11 +25,10 @@ def memoized(path):
 
 
 def configuration(argv):
-    opts, args = getopt.getopt(
-        argv, 's:', ['settings='])
-    for opt, arg in opts:
-        if opt in ('-s', '--settings'):
-            with open(arg) as config:
+    for idx, arg in enumerate(argv):
+        if arg in ['-s', '--settings']:
+            value = argv[idx + 1]
+            with open(value) as config:
                 return json.load(config)
     raise ValueError("Must specify --settings")
 
